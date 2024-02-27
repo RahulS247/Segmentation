@@ -1,6 +1,6 @@
 import os
 from PIL import Image
-from torch.utlis.data import Dataset
+from torch.utils.data import Dataset
 import numpy as np
 
 class NewDataset(Dataset):
@@ -11,14 +11,19 @@ class NewDataset(Dataset):
         self.images=os.listdir(image_dir)
 
     def __len__(self):
+        #print(len(self.images))
         return len(self.images)
 
 
     def __getitem__(self,index):
         img_path = os.path.join(self.image_dir,self.images[index])
-        mask_path = os.path.join(self.mask_dir,self.images[index])
-        image=np.array(Image.open(img_path))
-        mask=np.array(Image.open(mask_path))
+        mask_path = os.path.join(self.mask_dir,self.images[index].replace(".jpg", ".png"))
+        image=np.array(Image.open(img_path).convert("RGB"), dtype=np.float32)
+        mask=np.array(Image.open(mask_path).convert("L"), dtype=np.float32)
+
+        #print("image",image.shape)
+        #rint("mask",mask.shape)
+
         mask[mask==255.0]=1.0
 
         if self.transform is not None:
