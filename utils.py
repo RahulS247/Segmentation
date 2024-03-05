@@ -25,7 +25,7 @@ def get_loaders(
     train_ds = NewDataset(
         image_dir=train_dir,
         mask_dir=train_maskdir,
-        transform=None,
+        transform=train_transform,
     )
 
     train_loader = DataLoader(
@@ -39,7 +39,7 @@ def get_loaders(
     val_ds = NewDataset(
         image_dir=val_dir,
         mask_dir=val_maskdir,
-        transform=None,
+        transform=val_transform,
     )
 
     val_loader = DataLoader(

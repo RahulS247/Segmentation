@@ -18,32 +18,33 @@ from utils import (
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 8
-NUM_EPOCHS = 2
+NUM_EPOCHS = 1
 NUM_WORKERS = 0
 IMAGE_HEIGHT = 160  # 1280 originally
 IMAGE_WIDTH = 240  # 1918 originally
-PIN_MEMORY = False
+PIN_MEMORY = True
 LOAD_MODEL = False
-TRAIN_IMG_DIR = "tree-segmentation/images/"
-TRAIN_MASK_DIR = "tree-segmentation/masks/"
+#TRAIN_IMG_DIR = "tree-segmentation/images/"
+#TRAIN_MASK_DIR = "tree-segmentation/masks/"
 VAL_IMG_DIR = "tree-segmentation/val_images/"
 VAL_MASK_DIR = "tree-segmentation/val_masks/"
-
+TRAIN_IMG_DIR = "tree-segmentation/val_images/"
+TRAIN_MASK_DIR = "tree-segmentation/val_masks/"
 
 
 def train_fn(loader,model,optimizer,loss_fn,scaler):
     loop = tqdm(loader)
     for batch_idx,(data,targets) in enumerate(loop,0):
-        data=data.permute(0,3,1,2).to(device=DEVICE)
+        data=data.to(device=DEVICE)
         targets =targets.float().unsqueeze(1).to(device=DEVICE)
 
         #with torch.cuda.amp.autocast():
-        #print("data",data.dtype)
-        #print("target",targets.dtype)
+        #print("data",data.dtype,data.shape)
+        #print("target",targets.dtype,targets.shape)
 
         pred = model(data)
         loss = loss_fn(pred,targets)
-
+        #print("pred",pred.dtype,pred.shape)
         #backwards
         optimizer.zero_grad()
         loss.backward()
@@ -59,13 +60,15 @@ def train_fn(loader,model,optimizer,loss_fn,scaler):
 
 
 def main():
+    #train_transform=None
+    #val_transforms=None
 
     train_transform = A.Compose(
         [
             A.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
-            A.Rotate(limit=35, p=1.0),
-            A.HorizontalFlip(p=0.5),
-            A.VerticalFlip(p=0.1),
+            #A.Rotate(limit=35, p=1.0),
+            #A.HorizontalFlip(p=0.5),
+            #A.VerticalFlip(p=0.1),
             A.Normalize(
                 mean=[0.0, 0.0, 0.0],
                 std=[1.0, 1.0, 1.0],
